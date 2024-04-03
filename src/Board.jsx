@@ -1,6 +1,6 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Cell from "./Cell";
-import {random} from "lodash";
+import { random } from "lodash";
 import "./Board.css";
 
 /** Game board of Lights out.
@@ -28,21 +28,23 @@ import "./Board.css";
  *
  **/
 
-function Board({nrows, ncols, chanceLightStartsOn}) {
+function Board({ nrows, ncols, chanceLightStartsOn }) {
   const [board, setBoard] = useState(createBoard());
 
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
   function createBoard() {
     let initialBoard = [];
-    // TODO: create array-of-arrays of true/false values
+
     for (let row = 0; row < nrows; row++) {
       const newRow = [];
+
       for (let column = 0; column < ncols; column++) {
         newRow.push(random(0, 1) ? true : false);
       }
+
       initialBoard.push(newRow);
     }
-    console.log("initialBoard: ", initialBoard);
+
     return initialBoard;
   }
 
@@ -63,10 +65,17 @@ function Board({nrows, ncols, chanceLightStartsOn}) {
       };
 
       // TODO: Make a (deep) copy of the oldBoard
+      const boardCopy = oldBoard.map(a => a);
 
       // TODO: in the copy, flip this cell and the cells around it
+      flipCell(y, x, boardCopy);
+      flipCell(y + 1, x, boardCopy);
+      flipCell(y - 1, x, boardCopy);
+      flipCell(y, x + 1, boardCopy);
+      flipCell(y, x - 1, boardCopy);
 
       // TODO: return the copy
+      return boardCopy;
     });
   }
 
@@ -77,7 +86,23 @@ function Board({nrows, ncols, chanceLightStartsOn}) {
   // make table board
 
   // TODO
-  return <div>{board}</div>;
+  return (
+    <div>
+      <table>
+        <tbody>
+          {board.map((val, row) =>
+            <tr key={`row-${row}`}>
+              {val.map((cellState, col) =>
+                <Cell
+                  key={`${col}-${row}`}
+                  isLit={cellState}
+                  flipCellsAroundMe={flipCellsAround}
+                />)}
+            </tr>)}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 export default Board;
