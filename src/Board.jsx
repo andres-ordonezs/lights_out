@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Cell from "./Cell";
-import { random } from "lodash";
+import {random} from "lodash";
 import "./Board.css";
 
 /** Game board of Lights out.
@@ -27,8 +27,8 @@ import "./Board.css";
  *  This doesn't handle any clicks --- clicks are on individual cells
  *
  **/
-
-function Board({ nrows, ncols, chanceLightStartsOn }) {
+// TODO: Set defaults for size
+function Board({nrows, ncols, chanceLightStartsOn}) {
   const [board, setBoard] = useState(createBoard());
 
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
@@ -37,7 +37,7 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
 
     for (let row = 0; row < nrows; row++) {
       const newRow = [];
-
+      // TODO: Use chanceLightStartsoN prop
       for (let column = 0; column < ncols; column++) {
         newRow.push(random(0, 1) ? true : false);
       }
@@ -48,8 +48,11 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
     return initialBoard;
   }
 
+  /**
+   * Checks if all cells are false
+   */
   function hasWon() {
-    // TODO: check the board in state to determine whether the player has won.
+    return board.every((row) => row.every((col) => !col));
   }
 
   function flipCellsAround(coord) {
@@ -64,43 +67,48 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
         }
       };
 
-      // TODO: Make a (deep) copy of the oldBoard
-      const boardCopy = oldBoard.map(a => a);
+      const boardCopy = oldBoard.map((a) => [...a]);
 
-      // TODO: in the copy, flip this cell and the cells around it
       flipCell(y, x, boardCopy);
       flipCell(y + 1, x, boardCopy);
       flipCell(y - 1, x, boardCopy);
       flipCell(y, x + 1, boardCopy);
       flipCell(y, x - 1, boardCopy);
 
-      // TODO: return the copy
       return boardCopy;
     });
   }
 
   // if the game is won, just show a winning msg & render nothing else
-
-  // TODO
-
-  // make table board
-
-  // TODO
+  /*  if (hasWon()) {
+    return (
+      <div>
+        "You Won!"
+      </div>
+    );
+  } */
+  // TODO: rEFACTOR RETURN STATEMENT
   return (
-    <div>
-      <table>
-        <tbody>
-          {board.map((val, row) =>
-            <tr key={`row-${row}`}>
-              {val.map((cellState, col) =>
-                <Cell
-                  key={`${col}-${row}`}
-                  isLit={cellState}
-                  flipCellsAroundMe={flipCellsAround}
-                />)}
-            </tr>)}
-        </tbody>
-      </table>
+    <div className="Board">
+      {hasWon() ? (
+        "You won!"
+      ) : (
+        <table className="Board-table">
+          <tbody>
+            {board.map((cellRow, row) => (
+              <tr key={`row-${row}`}>
+                {cellRow.map((cellState, col) => (
+                  <Cell
+                    key={`${row}-${col}`}
+                    isLit={cellState}
+                    flipCellsAroundMe={() => flipCellsAround(`${row}-${col}`)}
+                  />
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
