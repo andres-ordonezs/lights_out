@@ -1,6 +1,6 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Cell from "./Cell";
-import {random} from "lodash";
+import { random } from "lodash";
 import "./Board.css";
 
 /** Game board of Lights out.
@@ -28,7 +28,7 @@ import "./Board.css";
  *
  **/
 // TODO: Set defaults for size
-function Board({nrows, ncols, chanceLightStartsOn}) {
+function Board({ nrows = 4, ncols = 4, chanceLightStartsOn = 0.30 }) {
   const [board, setBoard] = useState(createBoard());
 
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
@@ -37,9 +37,8 @@ function Board({nrows, ncols, chanceLightStartsOn}) {
 
     for (let row = 0; row < nrows; row++) {
       const newRow = [];
-      // TODO: Use chanceLightStartsoN prop
       for (let column = 0; column < ncols; column++) {
-        newRow.push(random(0, 1) ? true : false);
+        newRow.push(random(0, 1, true) > chanceLightStartsOn ? false : true);
       }
 
       initialBoard.push(newRow);
@@ -79,36 +78,37 @@ function Board({nrows, ncols, chanceLightStartsOn}) {
     });
   }
 
+  const boardTable = [];
+  for (let row = 0; row < nrows; row++) {
+    let newRow = [];
+    for (let col = 0; col < ncols; col++) {
+      newRow.push(
+        <Cell
+          key={`${row}-${col}`}
+          isLit={board[row][col]}
+          flipCellsAroundMe={() => flipCellsAround(`${row}-${col}`)}
+        />
+      );
+    }
+    boardTable.push(<tr key={`row-${row}`}>{newRow}</tr>);
+  }
+
   // if the game is won, just show a winning msg & render nothing else
-  /*  if (hasWon()) {
+  if (hasWon()) {
     return (
       <div>
         "You Won!"
       </div>
     );
-  } */
+  }
   // TODO: rEFACTOR RETURN STATEMENT
   return (
-    <div className="Board">
-      {hasWon() ? (
-        "You won!"
-      ) : (
-        <table className="Board-table">
-          <tbody>
-            {board.map((cellRow, row) => (
-              <tr key={`row-${row}`}>
-                {cellRow.map((cellState, col) => (
-                  <Cell
-                    key={`${row}-${col}`}
-                    isLit={cellState}
-                    flipCellsAroundMe={() => flipCellsAround(`${row}-${col}`)}
-                  />
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+    <div>
+      <table>
+        <tbody>
+          {boardTable}
+        </tbody>
+      </table>
     </div>
   );
 }
